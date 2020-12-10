@@ -1,0 +1,37 @@
+def find_parent_bags(bags: dict, bag_name: str) -> set:
+    containers = set()
+    for key, val in bags.items():
+        if bag_name in val.keys():
+            containers.add(key)
+    return containers
+
+lines = []
+with open('input_a.txt') as f:
+    for x in f:
+        lines.append(x.strip())
+
+
+bags = {}
+for line in lines:
+    big_bag, other = line.split(' contain ')
+    desc, col, _ = big_bag.split(' ')
+    key = desc + '_' + col
+    small_bags = other.split(', ')
+    small_bags_list = {}
+    for bag in small_bags:
+        num, other = bag.split(' ', 1)
+        if num == 'no':
+            break
+        desc, col, _ = other.split(' ')
+        small_bags_list[desc + '_' + col] = int(num)
+    
+    bags[key] = small_bags_list.copy()
+
+containers = find_parent_bags(bags, 'shiny_gold')
+working_list = list(containers)
+while not len(working_list) == 0:
+    res = find_parent_bags(bags, working_list.pop())
+    working_list.extend(res)
+    containers.update(res)
+print(containers)
+print(len(containers))
