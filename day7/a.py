@@ -10,7 +10,6 @@ with open('input_a.txt') as f:
     for x in f:
         lines.append(x.strip())
 
-
 bags = {}
 for line in lines:
     big_bag, other = line.split(' contain ')

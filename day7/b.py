@@ -27,11 +27,14 @@ for line in lines:
     
     bags[key] = small_bags_list.copy()
 
-containers = find_parent_bags(bags, 'shiny_gold')
-working_list = list(containers)
+containers = []
+working_list = ['shiny_gold'] 
 while not len(working_list) == 0:
-    res = find_parent_bags(bags, working_list.pop())
-    working_list.extend(res)
-    containers.update(res)
-print(containers)
+    cur = working_list.pop()
+    res = bags[cur]
+    for key, val in res.items():
+        for _ in range(val):
+            containers.append(key)
+            working_list.append(key)
+
 print(len(containers))
