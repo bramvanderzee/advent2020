@@ -45,7 +45,9 @@ class Ship:
         sx, sy = self.cur_pos
         wx, wy = self.way_pos
         if action == 'F':
-            self.cur_pos = (sx+wx, sy+wy)
+            for _ in range(mod):
+                sx, sy = sx+wx, sy+wy
+            self.cur_pos = (sx, sy)
         elif action == 'N':
             self.way_pos = (wx, wy+mod)
         elif action == 'E':
@@ -55,14 +57,16 @@ class Ship:
         elif action == 'W':
             self.way_pos = (wx-mod, wy)
         elif action == 'L' or action == 'R':
-            shift = (mod//90) % 4
+            shift = mod % 360
             if action == 'R':
                 shift = -shift
-            if shift == 180:
+            if shift == 180 or shift == -180:
                 self.way_pos = (-wx, -wy)
             elif shift == 90 or shift == -270:
                 self.way_pos = (-wy, wx)
             elif shift == -90 or shift == 270:
                 self.way_pos = (wy, -wx)
-
+        sx, sy = self.cur_pos
+        wx, wy = self.way_pos
+        print(action, ' ', mod, ' ', sx, ':', sy, ':',wx,':',wy)
         self.nav_index += 1
