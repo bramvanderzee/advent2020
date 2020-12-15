@@ -19,6 +19,5 @@ for _ in range(30000000-len(nums)):
     else:
         nums.append(0)
     prev_spoken[prev] = turn-1
-    print(turn, prev, nums[-1])
     P = prev
 print(nums[-1])
