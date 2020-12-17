@@ -1,4 +1,3 @@
-C = {}
 def to_dict(cubes):
     dict_ = {}
     for iz,z in enumerate(cubes):
@@ -7,23 +6,26 @@ def to_dict(cubes):
                 dict_[(ix, iy, iz)] = x
     return dict_
 
-def get_num_nearby_expanding(coord):
+def get_num_nearby_expanding(C: dict,coord):
     num = 0
     x, y, z = coord
     for dx in [-1, 0, 1]:
         for dy in [-1, 0, 1]:
             for dz in [-1, 0, 1]:
-                c = C.get((x+dx, y+dy, z+dz))
-                if c == '#':
-                    num += 1
-                elif c == None:
-                    C[(x+dx, y+dy, z+dz)] = '.'
-    return num
+                if not (dx == 0 and dy == 0 and dz == 0):
+                    c = C.get((x+dx, y+dy, z+dz))
+                    if c == '#':
+                        num += 1
+                    elif c == None:
+                        C.update({(x+dx, y+dy, z+dz):'.'})
+    return C,num
 
-def do_cycle():
+def do_cycle(C: dict):
     new_cubes = {}
+    print(len(C.keys()))
     for k in list(C.keys()):
-        num = get_num_nearby_expanding(k)
+        nC,num = get_num_nearby_expanding(C,k)
+        new_cubes.update(nC)
         v = C[k]
         if v == '#':
             if 2 <= num <= 3:
@@ -49,9 +51,9 @@ with open('input_ex.txt') as f:
     cubes.append(y)
 
 C = to_dict(cubes)
-
-for cycle in range(6):
-    C = do_cycle()
-    print(C)
+print(list(C.values()))
+for cycle in range(3):
+    C = do_cycle(C)
+    print(len(C))
 
 print(count_active())
