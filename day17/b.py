@@ -5,34 +5,36 @@ def to_ddict(cubes):
     for iz,z in enumerate(cubes):
         for iy,y in enumerate(z):
             for ix,x in enumerate(y):
-                dict_[(ix, iy, iz)] = x
+                dict_[(ix, iy, iz, 0)] = x
     return dict_
 
 def get_num_nearby_expanding(cubes: dict, coord):
     num = 0
-    x, y, z = coord
+    x, y, z, w = coord
     for dx in [-1, 0, 1]:
         for dy in [-1, 0, 1]:
             for dz in [-1, 0, 1]:
-                if not (dx == 0 and dy == 0 and dz == 0):
-                    c_coord = (x+dx, y+dy, z+dz)
-                    c = cubes.get(c_coord)
-                    if c == '#':
-                        num += 1
+                for dw in [-1, 0, 1]:
+                    if not (dx == 0 and dy == 0 and dz == 0 and dw == 0):
+                        c_coord = (x+dx, y+dy, z+dz, w+dw)
+                        c = cubes.get(c_coord)
+                        if c == '#':
+                            num += 1
     return num
 
 def expand(cubes: dict):
     new_cubes = {}
     for k in cubes.keys():
-        x, y, z = k
+        x, y, z, w = k
         for dx in [-1, 0, 1]:
             for dy in [-1, 0, 1]:
                 for dz in [-1, 0, 1]:
-                    if not (dx == 0 and dy == 0 and dz == 0):
-                        c_coord = (x+dx, y+dy, z+dz)
-                        c = cubes.get(c_coord)
-                        if c == None:
-                            new_cubes[c_coord] = '.'
+                    for dw in [-1, 0, 1]:
+                        if not (dx == 0 and dy == 0 and dz == 0 and dw == 0):
+                            c_coord = (x+dx, y+dy, z+dz, w+dw)
+                            c = cubes.get(c_coord)
+                            if c == None:
+                                new_cubes[c_coord] = '.'
     return new_cubes
 
 def do_cycle(cubes: dict):
