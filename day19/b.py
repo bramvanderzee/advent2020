@@ -14,23 +14,28 @@ with open('input.txt') as f:
         else:
             messages.append(x)
 
-def parse_regex(rules: dict, rule: str) -> str:
+def parse_regex(rules: dict, rule: str, depth: int) -> str:
     regex_rule = ''
+    depth += 1
+    if depth > 100:
+        return regex_rule
     if rule.count('"') > 0:
         return rule.replace('"', '')
     elif rule.count('|') == 0:
         indices = [int(x) for x in rule.split()]
         for i in indices:
-            regex_rule += parse_regex(rules, rules[i])
+            regex_rule += parse_regex(rules, rules[i], depth)
         return regex_rule
     else:
         a, b = rule.split(' | ', 1)
-        a = parse_regex(rules, a)
-        b = parse_regex(rules, b)
+        a = parse_regex(rules, a, depth)
+        b = parse_regex(rules, b, depth)
         regex_rule += '(' + a + '|' + b + ')'
         return regex_rule
 
-rules_regex = {k:parse_regex(R, v) for k,v in R.items()}
+R[8] = '42 | 42 8'
+R[11] = '42 31 | 42 11 31'
+rules_regex = {k:parse_regex(R, v, 0) for k,v in R.items()}
 
 ans = 0
 for line in messages:
