@@ -17,7 +17,7 @@ with open('input.txt') as f:
 def parse_regex(rules: dict, rule: str, depth: int) -> str:
     regex_rule = ''
     depth += 1
-    if depth > 100:
+    if depth > 30:
         return regex_rule
     if rule.count('"') > 0:
         return rule.replace('"', '')
