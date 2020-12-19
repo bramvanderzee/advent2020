@@ -4,16 +4,16 @@ from collections import deque
 lines = [] 
 with open('input.txt') as f:
     for op in f:
-        op = op.strip()
-        op = op.replace(' ', ',')
-        op = op.replace('(', '[')
-        op = op.replace(')', ']')
-        op = op.replace('*', '"*"')
-        op = op.replace('+', '"+"')
-        op = '[' + op + ']'
+	op = op.strip()
+	op = op.replace(' ', ',')
+	op = op.replace('(', '[')
+	op = op.replace(')', ']')
+	op = op.replace('*', '"*"')
+	op = op.replace('+', '"+"')
+	op = '[' + op + ']'
 
-        jsonline = json.loads(str(op))
-        lines.append(deque(jsonline))
+	jsonline = json.loads(str(op))
+	lines.append(deque(jsonline))
 
 def calculate(c: deque) -> int:
     tot = c.popleft()
