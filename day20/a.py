@@ -38,7 +38,7 @@ maps = {}
 cur_id = 0
 cur_map = []
 next = False
-with open('input.txt') as f:
+with open('input_ex.txt') as f:
     for x in f:
         x = x.strip()
         if x == '':
@@ -57,6 +57,7 @@ with open('input.txt') as f:
             cur_id = int(t)
         else:
             cur_map.append([y for y in x])
+    maps[cur_id] = np.array(cur_map)
 
 matches = defaultdict(lambda: []) 
 ans = 1
