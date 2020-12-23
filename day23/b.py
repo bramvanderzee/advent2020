@@ -4,7 +4,6 @@ with open('input_ex.txt') as f:
 
 from_cup = max(cups)+1
 cups.extend([x+from_cup for x in range(1000000-len(cups))])
-print(max(cups))
 
 def do_move(all_cups: list, index: int) -> list:
     new_cups = []
@@ -32,8 +31,8 @@ for move in range(1, 10000001):
     cur_cup_i = cups.index(prev)
     cur_cup_i += 1
     cur_cup_i = cur_cup_i%len(cups)
-    if move in progress_markers:
-        print('#', end='')
+    if move%1000000 == 0:
+        print(move)
 
 index1 = cups.index(1)
 cup1, cup2 = cups[(index1+1)%len(cups)], cups[(index1+2)%len(cups)]
