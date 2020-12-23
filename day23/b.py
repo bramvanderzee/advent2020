@@ -4,34 +4,33 @@ with open('input_ex.txt') as f:
 
 from_cup = max(cups)+1
 cups.extend([x+from_cup for x in range(1000000-len(cups))])
+MIN = min(cups)
+MAX = max(cups)
 
 def do_move(all_cups: list, index: int) -> list:
-    new_cups = []
+    cur_cup = all_cups[index]
     indices = [(index+x)%len(all_cups) for x in range(1,4)]
     picked = [all_cups[x] for x in indices]
-    new_cups = [x for x in all_cups if not x in picked]
-    cur_cup = all_cups[index]
-    dest_cup = cur_cup - 1 if not cur_cup == min(new_cups) else max(all_cups)
-
+    for cup in picked:
+        all_cups.remove(cup)
+    dest_cup = cur_cup - 1 if not cur_cup == MIN else MAX
+    
     while dest_cup in picked:
         dest_cup -= 1
-        if dest_cup < min(new_cups):
-            dest_cup = max(new_cups)
+        if dest_cup < MIN:
+            dest_cup = MAX
     
-    dest_cup_i = new_cups.index(dest_cup) + 1
+    dest_cup_i = all_cups.index(dest_cup) + 1
     for cup in picked[::-1]:
-        new_cups.insert(dest_cup_i, cup)
-    return list(new_cups)
+        all_cups.insert(dest_cup_i, cup)
+    return all_cups 
 
 cur_cup_i = 0
-progress_markers = [100000*x for x in range(10)]
 for move in range(1, 10000001):
     prev = cups[cur_cup_i]
     cups = do_move(cups, cur_cup_i)
-    cur_cup_i = cups.index(prev)
-    cur_cup_i += 1
-    cur_cup_i = cur_cup_i%len(cups)
-    if move%1000000 == 0:
+    cur_cup_i = (cups.index(prev)+1)%len(cups)
+    if move%10000 == 0:
         print(move)
 
 index1 = cups.index(1)
