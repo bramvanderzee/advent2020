@@ -19,18 +19,21 @@ with open('input_ex.txt') as f:
         M[(x, y)] = not M[(x, y)]
 
 print(list(M.values()).count(True))
-for day in range(1, 101):
-    new_M = defaultdict(lambda: False)
-    # find adjacents
-    for x, y in list(M.keys()):
+for day in range(100):
+    new_M = {}
+    to_check = deque([x for x in M.keys()])
+
+    while len(to_check) > 0:
+        key = to_check.popleft()
         num = 0
         for dx, dy in dirs.values():
+            x, y = key
             if M[(x+dx,y+dy)] == True:
                 num += 1
-        if M[(x, y)] == True and (num == 0 or num > 2):
-            new_M[(x,y)] = False
-        elif M[(x, y)] == False and num == 2:
-            new_M[(x, y)] = True
+        if M[key] == True and (num == 0 or num > 2):
+            new_M[key] = False
+        elif M[key] == False and num == 2:
+            new_M[key] = True
     for k,v in new_M.items():
-        M[k] = v
-    print('Day', day, list(M.values()).count(True))
+        M[k] = v 
+    print(day+1, list(M.values()).count(True))
