@@ -21,18 +21,21 @@ with open('input_ex.txt') as f:
 print(list(M.values()).count(True))
 for day in range(100):
     new_M = {}
-    to_check = deque([x for x in M.keys()])
+    nums = defaultdict(int)
 
-    while len(to_check) > 0:
-        key = to_check.popleft()
-        num = 0
+    for key in list(M.keys()):
+        nums[key] = 0
         for dx, dy in dirs.values():
             x, y = key
             if M[(x+dx,y+dy)] == True:
-                num += 1
-        if M[key] == True and (num == 0 or num > 2):
+                nums[key] += 1
+
+    to_check = deque([x for x in M.keys()])
+    while len(to_check) > 0:
+        key = to_check.popleft()
+        if M[key] == True and (nums[key] == 0 or nums[key] > 2):
             new_M[key] = False
-        elif M[key] == False and num == 2:
+        elif M[key] == False and nums[key] == 2:
             new_M[key] = True
     for k,v in new_M.items():
         M[k] = v 
