@@ -1,5 +1,5 @@
 from collections import defaultdict, deque
-M = defaultdict(lambda: False)
+MAP = defaultdict(lambda: False)
 # Black = True, White = False
 dirs = {'e': (2,0), 'ne': (1,1), 'nw': (-1,1), 'w': (-2,0), 'sw': (-1,-1), 'se': (1,-1)}
 with open('input_ex.txt') as f:
@@ -16,27 +16,27 @@ with open('input_ex.txt') as f:
         for direction in route:
             dx, dy = dirs[direction]
             x, y = x+dx, y+dy
-        M[(x, y)] = not M[(x, y)]
+        MAP[(x, y)] = not MAP[(x, y)]
 
-print(list(M.values()).count(True))
+print(list(MAP.values()).count(True))
 for day in range(100):
-    new_M = {}
+    new_map = {}
     nums = defaultdict(int)
 
-    for key in list(M.keys()):
+    for key in list(MAP.keys()):
         nums[key] = 0
         for dx, dy in dirs.values():
             x, y = key
-            if M[(x+dx,y+dy)] == True:
+            if MAP[(x+dx,y+dy)] == True:
                 nums[key] += 1
 
-    to_check = deque([x for x in M.keys()])
+    to_check = deque([x for x in MAP.keys()])
     while len(to_check) > 0:
         key = to_check.popleft()
-        if M[key] == True and (nums[key] == 0 or nums[key] > 2):
-            new_M[key] = False
-        elif M[key] == False and nums[key] == 2:
-            new_M[key] = True
-    for k,v in new_M.items():
-        M[k] = v 
-    print(day+1, list(M.values()).count(True))
+        if MAP[key] == True and (nums[key] == 0 or nums[key] > 2):
+            new_map[key] = False
+        elif MAP[key] == False and nums[key] == 2:
+            new_map[key] = True
+    for key,value in new_map.items():
+        MAP[key] = value 
+    print(day+1, list(MAP.values()).count(True))
