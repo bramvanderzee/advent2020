@@ -1,15 +1,25 @@
 import numpy as np
 import math
-from collections import defaultdict, deque
+from collections import defaultdict
+
+sm = """                  # 
+#    ##    ##    ###
+ #  #  #  #  #  #   """
+sm = list([x.replace(' ', '.') for x in sm.split('\n')])
+sm_coords = set()
+for y, r in enumerate(sm):
+    for x, c in enumerate(r):
+        if c == '#':
+            sm_coords.add((x, y))
 
 def rotate(map_: list, num: int) -> list:
-    return np.rot90(map_, num)
+    return np.rot90(map_, num).tolist()
 
 def flip_hor(map_: list) -> list:
-    return np.fliplr(map_)
+    return np.fliplr(map_).tolist()
 
 def flip_ver(map_: list) -> list:
-    return np.flipud(map_)
+    return np.flipud(map_).tolist()
 
 def get_sides(map_: list) -> dict:
     sides = {}
@@ -22,31 +32,53 @@ def get_sides(map_: list) -> dict:
 def check_border(map1: list, map2: list, side: str):
     to_match = get_sides(map1)
     to_match = to_match[side]
+    other_side = 'DRUL'['ULDR'.index(side)]
 
     for x in range(4):
         rot_map = rotate(map2, x)
         sides = get_sides(rot_map)
-        for k,v in sides.items():
-            if to_match in v:
-                return True, rot_map
-            elif to_match[::-1] in v:
-                if k in ['R', 'L']:
-                    return True, flip_hor(rot_map)
-                else:
-                    return True, flip_ver(rot_map)
+
+        v = sides[other_side]
+        if to_match == v:
+            return True, rot_map
+        elif to_match[::-1] == v:
+            if other_side in ['R', 'L']:
+                return True, flip_ver(rot_map)
+            else:
+                return True, flip_hor(rot_map)
     return False
 
 def check_borders(map1: list, map2: list):
-    for s in ['U', 'D', 'L', 'R']:
-        if check_border(map1, map2, s):
-            return True,s
+    for side in ['U', 'D', 'L', 'R']:
+        if check_border(map1, map2, side):
+            return True,side
     return False
+
+def find_num_seamonster(map_: list):
+    num = 0
+    for y,r in enumerate(map_):
+        for x,c in enumerate(r):
+            check = []
+            for dx, dy in sm_coords:
+                if x+dx >= len(map_[0]) or y+dy >= len(map_):
+                    check.append(False)
+                    break
+                check.append(map_[y+dy][x+dx] == '#')
+            if all(check):
+                print(x, y)
+                num += 1
+    return num
+
+def calc_roughness(map_: list, num_seamonster: int):
+    sm_num = len(sm_coords)
+    total = sum([x.count('#') for x in map_])
+    return total - (sm_num * num_seamonster)
 
 maps = {}
 cur_id = 0
 cur_map = []
 next_ = False
-with open('input_ex.txt') as f:
+with open('input.txt') as f:
     for x in f:
         x = x.strip()
         if x == '':
@@ -77,6 +109,7 @@ startpoint_id = [k for k,v in matches.items() if len(v) == 2][0]
 
 #orientation of first corner:
 found = False
+maps[startpoint_id] = flip_hor(maps[startpoint_id])
 while not found:
     dirs = []
     maps[startpoint_id] = rotate(maps[startpoint_id], 1)
@@ -87,32 +120,56 @@ while not found:
     if dirs.count('D') > 0 and dirs.count('R') > 0:
         found = True
 
-print(maps[startpoint_id])
 size = int(math.sqrt(len(matches)))
-full_map = np.array(np.array([]))
+full_map = []
+seen = set()
 for y in range(size):
-    row = np.array(maps[startpoint_id])
+    row = list([[y for y in x[1:-1]] for x in maps[startpoint_id][1:-1]])
     prev_id = startpoint_id
-    for x in range(size):
+    seen.add(startpoint_id)
+    for x in range(size-1):
         matched = {k:maps[k] for k in matches[prev_id]}
-        id_to_bottom = 0
+        id_to_right = 0
         for k,v in matched.items():
             _, d = check_borders(maps[prev_id], v)
             if d == 'R':
-                id_to_bottom = k
-                continue
-        map_to_right = maps[id_to_bottom]
-        print(map_to_right)
-        row = np.append(row, map_to_right, 1)
-    full_map = np.append(full_map, row, 0)
+                id_to_right = k
+                break
+        seen.add(id_to_right)
+        _, maps[id_to_right] = check_border(maps[prev_id], maps[id_to_right], 'R')
+        prev_id = id_to_right
+        for i, r in enumerate(maps[id_to_right][1:-1]):
+            row[i].extend(r[1:-1])
 
-    matched = {k:maps[k] for k in matches[startpoint_id]}
-    id_to_bottom = 0
-    for k,v in matched.items():
-        _, d = check_borders(maps[startpoint_id], v)
-        if d == 'D':
-            id_to_bottom = k
-            continue
-    startpoint_id = id_to_bottom
+    for i, r in enumerate(row):
+        full_map.append(r)
 
-print(full_map)
+    matched = {k:maps[k] for k in matches[startpoint_id] if not k in seen}
+    if not len(matched) == 0:
+        id_to_bottom = list(matched.keys())[0]
+        assert id_to_bottom != 0
+        _, maps[id_to_bottom] = check_border(maps[startpoint_id], maps[id_to_bottom], 'D')
+        maps[id_to_bottom] = maps[id_to_bottom]
+        startpoint_id = id_to_bottom
+    else:
+        break
+
+for row in full_map:
+    print(''.join(row))
+
+# Search sea monsters, rotate/flip if found none
+for f in range(4):
+    if f in [1, 2]:
+        full_map = flip_hor(full_map)
+    if f in [2, 3]:
+        full_map = flip_ver(full_map)
+
+    for r in range(4):
+        full_map = rotate(full_map, r)
+        num_sea_monsters = find_num_seamonster(full_map)
+        if num_sea_monsters != 0:
+            for row in full_map:
+                print(''.join(row))
+            print(num_sea_monsters)
+            print(calc_roughness(full_map, num_sea_monsters))
+            break
